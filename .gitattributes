@@ -1,0 +1,10 @@
+*.c text eol=lf
+*.cpp text eol=lf
+
+Makefile text eol=lf
+*.mk text eol=lf
+
+*.md text eol=lf
+*.txt text eol=lf
+*.csv text eol=lf
+*.json text eol=lf
