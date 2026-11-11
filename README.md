@@ -55,9 +55,9 @@ Algoritma *Vogel's Approximation Method* (VAM) klasik bekerja berdasarkan prinsi
    - Untuk setiap baris aktif $i$, cari biaya terendah pertama ($c^{(1)}_i$) dan kedua ($c^{(2)}_i$):
      $$\text{Penalti Baris } P_i = c^{(2)}_i - c^{(1)}_i$$
    - Untuk setiap kolom aktif $j$, cari biaya terendah pertama ($c^{(1)}_j$) dan kedua ($c^{(2)}_j$):
-     $$\text{Penalti Kolom } Q_j = c^{(2)}_j - c^{(1)}_j$$
+     $$\text{Penalti Kolom } P_j = c^{(2)}_j - c^{(1)}_j$$
 3. **Pilih Garis dengan Penalti Terbesar**:
-   - Tentukan baris atau kolom dengan nilai penalti maksimum: $\max(P_i, Q_j)$.
+   - Tentukan baris atau kolom dengan nilai penalti maksimum: $\max(P_i, P_j)$.
    - Aturan *tie-breaking*: Jika terdapat penalti bernilai sama, implementasi standar memilih kandidat baris/kolom pertama yang ditemukan.
 4. **Pilih Sel Biaya Minimum pada Garis Terpilih**:
    - Pada baris/kolom terpilih tersebut, pilih sel $(i, j)$ dengan biaya transportasi asli terkecil:
@@ -84,19 +84,31 @@ Berikut adalah diagram alir eksekusi VAM standar:
 
 1. **Inisialisasi & Penyeimbangan Masalah**:
    - Periksa total suplai dan permintaan. Tambahkan baris/kolom *dummy* berbiaya 0 bila masalah tidak seimbang.
-2. **Hitung Rata-rata Biaya Baris & Kolom Aktif Tiap Iterasi**:
-   - Rata-rata baris aktif ($i \in N'$):
-     $$AVG_i = \frac{1}{|M'|} \sum_{j \in M'} C_{ij}$$
-   - Rata-rata kolom aktif ($j \in M'$):
-     $$AVG_j = \frac{1}{|N'|} \sum_{i \in N'} C_{ij}$$
-     *(di mana $N'$ dan $M'$ adalah himpunan baris dan kolom yang masih memiliki sisa alokasi).*
+
+2. **Hitung Rata-rata Biaya Baris & Kolom Aktif:**
+   - **Rata-rata baris aktif:**
+
+     $$
+     AVG_i = \frac{\sum_{j \in J} C_{ij}}{|J|}
+     $$
+
+     dengan $J$ adalah himpunan kolom aktif dan $|J|$ adalah jumlah kolom aktif.
+
+   - **Rata-rata kolom aktif:**
+
+     $$
+     AVG_j = \frac{\sum_{i \in I} C_{ij}}{|I|}
+     $$
+
+     dengan $I$ adalah himpunan baris aktif dan $|I|$ adalah jumlah baris aktif.
+
 3. **Transformasi Matriks Biaya Relatif ($CR_{ij}$)**:
-   - Hitung nilai penyesuaian biaya relatif untuk setiap sel aktif $(i, j)$:
+   - Hitung biaya relatif untuk setiap sel aktif $(i, j)$:
      $$CR_{ij} = C_{ij} - AVG_i - AVG_j$$
-4. **Hitung Penalti Baris & Kolom berbasis $CR$**:
+4. **Hitung Penalti Baris & Kolom berbasis biaya relatif $CR$**:
    - Cari dua nilai $CR$ terkecil pada setiap baris aktif dan kolom aktif.
    - Penalti baris: $P_i = CR^{(2)}_i - CR^{(1)}_i$.
-   - Penalti kolom: $Q_j = CR^{(2)}_j - CR^{(1)}_j$.
+   - Penalti kolom: $P_j = CR^{(2)}_j - CR^{(1)}_j$.
 5. **Seleksi Garis Terpilih (Tie-Breaking 4 Tingkat)**:
    - Evaluasi seluruh baris dan kolom aktif menggunakan kriteria terurut berikut:
      1. Prioritas 1: **Penalti Terbesar** ($\max \text{Penalty}$).
@@ -112,7 +124,7 @@ Berikut adalah diagram alir eksekusi VAM standar:
    - Alokasikan $q = \min(S_i, D_j)$ pada sel terpilih.
    - Perbarui sisa stok $S_i \leftarrow S_i - q$ dan sisa permintaan $D_j \leftarrow D_j - q$.
    - Eliminasi baris jika $S_i = 0$ dan eliminasi kolom jika $D_j = 0$.
-   - Ulangi langkah 2–7 hingga seluruh permintaan terpenuhi.
+8. **Ulangi langkah 2–7 hingga seluruh permintaan terpenuhi.**
 
 ### Flowchart Algoritma SERDA Method
 Berikut adalah diagram alir eksekusi SERDA Method (DMO-VAM):
