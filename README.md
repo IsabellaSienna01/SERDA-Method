@@ -88,7 +88,7 @@ Berikut adalah diagram alir eksekusi VAM standar:
 
 2. **Hitung Rata-rata Biaya Baris & Kolom Aktif:**
 
-   a. **Rata-rata baris aktif:**
+   - Rata-rata baris aktif:
 
 $$
 AVG_i = \frac{\sum_{j \in J} C_{ij}}{|J|}
@@ -96,7 +96,7 @@ $$
 
    Dengan J adalah himpunan kolom aktif dan |J| adalah jumlah kolom aktif.
 
-   b. **Rata-rata kolom aktif:**
+   - Rata-rata kolom aktif:
 
 $$
 AVG_j = \frac{\sum_{i \in I} C_{ij}}{|I|}
