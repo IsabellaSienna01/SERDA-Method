@@ -85,22 +85,25 @@ Berikut adalah diagram alir eksekusi VAM standar:
 1. **Inisialisasi & Penyeimbangan Masalah**:
    - Periksa total suplai dan permintaan. Tambahkan baris/kolom *dummy* berbiaya 0 bila masalah tidak seimbang.
 
+
 2. **Hitung Rata-rata Biaya Baris & Kolom Aktif:**
-   - **Rata-rata baris aktif:**
 
-     $$
-     AVG_i = \frac{\sum_{j \in J} C_{ij}}{|J|}
-     $$
+   a. **Rata-rata baris aktif:**
 
-     dengan $J$ adalah himpunan kolom aktif dan $|J|$ adalah jumlah kolom aktif.
+$$
+AVG_i = \frac{\sum_{j \in J} C_{ij}}{|J|}
+$$
 
-   - **Rata-rata kolom aktif:**
+   Dengan J adalah himpunan kolom aktif dan |J| adalah jumlah kolom aktif.
 
-     $$
-     AVG_j = \frac{\sum_{i \in I} C_{ij}}{|I|}
-     $$
+   b. **Rata-rata kolom aktif:**
 
-     dengan $I$ adalah himpunan baris aktif dan $|I|$ adalah jumlah baris aktif.
+$$
+AVG_j = \frac{\sum_{i \in I} C_{ij}}{|I|}
+$$
+
+   Dengan I adalah himpunan baris aktif dan |I| adalah jumlah baris aktif.
+
 
 3. **Transformasi Matriks Biaya Relatif ($CR_{ij}$)**:
    - Hitung biaya relatif untuk setiap sel aktif $(i, j)$:
