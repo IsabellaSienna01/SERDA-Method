@@ -676,6 +676,90 @@ Perintah ini menghapus file sementara hasil kompilasi, seperti `.exe` dan `.o`.
 
 ---
 
+## 9. Menjalankan Automated Benchmark
+
+Untuk menjalankan pengujian otomatis terhadap 69 testcase untuk ke-8 metode secara sekaligus ($69 \times 8 = 552$ eksekusi):
+
+```bash
+make benchmark
+```
+Atau jalankan binernya secara langsung:
+```bash
+./benchmark.exe
+```
+
+Hasil pengujian akan diperbarui pada direktori `results/`:
+- `results/benchmark_summary.csv`: Ringkasan metrik akurasi, mean gap, dan rata-rata waktu.
+- `results/benchmark_details.csv`: Data matriks biaya per kasus uji.
+- `results/benchmark_report.txt`: Laporan perbandingan lengkap terformat.
+
+---
+
+## 10. Menjalankan Program Secara Mandiri
+
+### Mode Human-Readable (Trace Iterasi)
+```bash
+./SERDA.exe dataset/G1_N01.txt
+./VAM.exe   dataset/G1_N01.txt
+./SAM.exe   dataset/G1_N01.txt
+./CSM.exe   dataset/G1_N01.txt
+./RBSM.exe  dataset/G1_N01.txt
+./IHW.exe   dataset/G1_N01.txt
+./THP.exe   dataset/G1_N01.txt
+./FVAM.exe  dataset/G1_N01.txt
+```
+
+### Mode Machine-Readable (`--benchmark`)
+```bash
+./SERDA.exe dataset/G1_N01.txt --benchmark
+```
+*Format Output:*
+```text
+METHOD:SERDA,STATUS:SUCCESS,COST:5600.00,FEASIBLE:1,TIME_MS:0.0870
+```
+
+---
+
+## 11. Format Input & Output
+
+### Format Berkas Testcase (`.txt`)
+```text
+m n
+
+cost[0][0] cost[0][1] ... cost[0][n-1]
+cost[1][0] cost[1][1] ... cost[1][n-1]
+...
+cost[m-1][0] ... cost[m-1][n-1]
+
+supply[0] supply[1] ... supply[m-1]
+demand[0] demand[1] ... demand[n-1]
+```
+
+### Penanganan Kasus Tidak Seimbang (Unbalanced)
+Fungsi balancing otomatis diterapkan pada setiap program:
+- Jika $\sum \text{Suplai} > \sum \text{Permintaan}$: Ditambahkan 1 kolom *dummy* berbiaya 0 dengan permintaan sebesar selisihnya.
+- Jika $\sum \text{Permintaan} > \sum \text{Suplai}$: Ditambahkan 1 baris *dummy* berbiaya 0 dengan suplai sebesar selisihnya.
+
+---
+
+## 12. Formula dan Metrik Evaluasi
+
+1. **Akurasi Solusi Optimal (%)**:
+   $$\text{Accuracy (\%)} = \left( \frac{\text{Jumlah Testcase Optimal}}{\text{Total Testcase}} \right) \times 100\%$$
+   Kriteria optimal terpenuhi jika selisih nilai terhadap solusi optimal eksak $\le 10^{-4}$:
+   $$|Z_{\text{method}} - Z_{\text{optimal}}| \le 10^{-4}$$
+
+2. **Optimality Gap (%)**:
+   $$\text{Gap (\%)} = \left( \frac{Z_{\text{method}} - Z_{\text{optimal}}}{Z_{\text{optimal}}} \right) \times 100\%$$
+
+3. **Statistik Gap**:
+   - **Mean Gap**: Rata-rata persentase deviasi biaya.
+   - **Median Gap**: Nilai median dari sebaran gap.
+   - **Max Gap**: Deviasi biaya terbesar yang ditemukan pada pengujian.
+   - **Std Dev Gap**: Standar deviasi yang menunjukkan konsistensi metode.
+
+---
+
 # Hasil Pengujian & Analisis Komparasi
 
 ## 13. Ringkasan Hasil Benchmark (69 Testcase)
