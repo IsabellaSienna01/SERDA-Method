@@ -22,14 +22,17 @@ Fokus utama repository ini adalah membandingkan metode **VAM Standar (Vogel's Ap
   - [2. Langkah Algoritma SERDA Method](#2-langkah-algoritma-serda-method)
   - [3. Perbandingan Pseudocode VAM Standar dan SERDA Method](#3-perbandingan-pseudocode-vam-standar-dan-serda-method)
   - [4. Implementasi Kode Inti `(src/SERDA.c)`](#4-implementasi-kode-inti-srcserdac)
-  - [5. Tracing Eksekusi Program Step-by-Step](#5-tracing-eksekusi-program-step-by-step)
-    - [5.1 Tracing Kasus Standar: `G1_N01.txt`](#51-tracing-kasus-standar-g1_n01txt)
-    - [5.2 Tracing Kasus Perangkap Biaya VAM: `G3_N35.txt`](#52-tracing-kasus-perangkap-biaya-vam-g3_n35txt)
-    - [5.3 Tracing Kasus Penalti Kolom Dini: `G2_N14.txt`](#53-tracing-kasus-penalti-kolom-dini-g2_n14txt)
+  - [5. Tracing Eksekusi Program](#5-tracing-eksekusi-program)
+    - [5.1 Case Standar: `G1_N01.txt`](#51-case-standar-g1_n01txt)
+    - [5.2 Case Perbandingan Biaya: `G3_N35.txt`](#52-case-perbandingan-biaya-g3_n35txt)
+    - [5.3 Case Prioritas Alokasi Kolom: `G2_N14.txt`](#53-case-prioritas-alokasi-kolom-g2_n14txt)
 - [Panduan Teknis Penggunaan Repositori](#panduan-teknis-penggunaan-repositori)
-  - [6. Ringkasan 8 Metode yang Dibandingkan](#6-ringkasan-8-metode-yang-dibandingkan)
+  - [6. Metode yang Digunakan](#6-metode-yang-digunakan)
   - [7. Struktur Direktori](#7-struktur-direktori)
-  - [8. Prasyarat Sistem & Kompilasi (`make all`, `make clean`)](#8-prasyarat-sistem--kompilasi)
+  - [8. Cara Menjalankan Program](#8-cara-menjalankan-program)
+    - [8.1 Persiapan](#81-persiapan)
+    - [8.2 Kompilasi Program](#82-kompilasi-program)
+    - [8.3 Membersihkan File Kompilasi](#83-membersihkan-file-kompilasi)
   - [9. Menjalankan Automated Benchmark](#9-menjalankan-automated-benchmark)
   - [10. Menjalankan Program Secara Mandiri](#10-menjalankan-program-secara-mandiri)
   - [11. Format Input & Output](#11-format-input--output)
@@ -324,6 +327,354 @@ if (chosen_line.is_row) {
 }
 ```
 
+---
+
+## 5. Tracing Eksekusi Program
+
+Tracing dilakukan pada tiga case untuk melihat bagaimana SERDA dan VAM menentukan alokasi, serta pengaruhnya terhadap total biaya transportasi.
+
+### 5.1 Case Standar: `G1_N01.txt`
+
+Case pertama menggunakan 3 sumber dan 3 tujuan. SERDA dan VAM menghasilkan biaya yang sama dengan solusi optimal.
+
+- **Dimensi:** 3 sumber × 3 tujuan
+- **Biaya optimal:** 5600
+- **Hasil VAM:** 5600
+- **Hasil SERDA:** 5600
+
+**Proses alokasi SERDA:**
+
+```text
+Iterasi 1:
+  Garis terpilih : Kolom 3 (Penalti = 80.0000, Min CR = -148.0000)
+  Sel terpilih   : [3, 3] dengan biaya 60.00
+  Alokasi        : 30.00 unit
+  Sisa Supply 3 : 15.00
+  Sisa Demand 3 : 0.00 (Kolom 3 selesai)
+
+Iterasi 2:
+  Garis terpilih : Baris 3 (Penalti = 85.3333, Min CR = -122.6667)
+  Sel terpilih   : [3, 2] dengan biaya 80.00
+  Alokasi        : 15.00 unit
+  Sisa Supply 3 : 0.00 (Baris 3 selesai)
+  Sisa Demand 2 : 20.00
+
+Iterasi 3:
+  Garis terpilih : Baris 1 (Penalti = 0.0000, Min CR = -50.0000)
+  Sel terpilih   : [1, 1] dengan biaya 32.00
+  Alokasi        : 20.00 unit
+  Sisa Supply 1 : 0.00 (Baris 1 selesai)
+  Sisa Demand 1 : 10.00
+
+Iterasi 4:
+  Garis terpilih : Baris 2 (Penalti = 0.0000, Min CR = -64.0000)
+  Sel terpilih   : [2, 1] dengan biaya 60.00
+  Alokasi        : 10.00 unit
+  Sisa Supply 2 : 20.00
+  Sisa Demand 1 : 0.00 (Kolom 1 selesai)
+
+Iterasi 5:
+  Garis terpilih : Baris 2 (Penalti = 0.0000, Min CR = -68.0000)
+  Sel terpilih   : [2, 2] dengan biaya 68.00
+  Alokasi        : 20.00 unit
+  Sisa Supply 2 : 0.00
+  Sisa Demand 2 : 0.00 (Semua terpenuhi)
+
+Total Transportation Cost SERDA = 5600.00 (Optimal)
+```
+
+Seluruh suplai dan permintaan terpenuhi dalam lima iterasi. SERDA dan VAM sama-sama mencapai biaya optimal sebesar 5600.
+
+---
+
+### 5.2 Case Perbandingan Biaya: `G3_N35.txt`
+
+SERDA menghasilkan biaya 280, sedangkan VAM menghasilkan biaya 320. Perbedaannya ada pada urutan alokasi, terutama saat menentukan sumber untuk memenuhi permintaan D1 dan D4.
+
+**Matriks biaya dan kapasitas:**
+
+| Sumber / Tujuan | D1 | D2 | D3 | D4 | Suplai |
+|---|---:|---:|---:|---:|---:|
+| **S1** | 1 | 6 | 5 | 9 | **20** |
+| **S2** | 3 | 2 | 4 | 15 | **25** |
+| **S3** | 8 | 9 | 3 | 10 | **15** |
+| **Permintaan** | **15** | **15** | **10** | **20** | **60** |
+
+**Biaya optimal eksak: 280**
+
+#### Hasil SERDA
+
+SERDA menyelesaikan alokasi dalam enam iterasi dengan total biaya 280.
+
+```text
+Iterasi 1:
+  Kolom 2 → Sel [2, 2] = 15 unit, biaya 2
+  Permintaan D2 terpenuhi
+
+Iterasi 2:
+  Baris 2 → Sel [2, 1] = 10 unit, biaya 3
+  Suplai S2 habis
+
+Iterasi 3:
+  Kolom 1 → Sel [1, 1] = 5 unit, biaya 1
+  Permintaan D1 terpenuhi
+
+Iterasi 4:
+  Baris 1 → Sel [1, 4] = 15 unit, biaya 9
+  Suplai S1 habis
+
+Iterasi 5:
+  Baris 3 → Sel [3, 3] = 10 unit, biaya 3
+  Permintaan D3 terpenuhi
+
+Iterasi 6:
+  Baris 3 → Sel [3, 4] = 5 unit, biaya 10
+  Seluruh kebutuhan terpenuhi
+```
+
+**Matriks alokasi SERDA:**
+
+| Sumber / Tujuan | D1 | D2 | D3 | D4 |
+|---|---:|---:|---:|---:|
+| **S1** | 5 | 0 | 0 | 15 |
+| **S2** | 10 | 15 | 0 | 0 |
+| **S3** | 0 | 0 | 10 | 5 |
+
+**Total biaya SERDA:**
+
+`(5 × 1) + (15 × 9) + (10 × 3) + (15 × 2) + (10 × 3) + (5 × 10) = 280`
+
+#### Hasil VAM Standar
+
+VAM menghasilkan biaya 320, lebih tinggi 14,29% dari biaya optimal.
+
+**Matriks alokasi VAM:**
+
+| Sumber / Tujuan | D1 | D2 | D3 | D4 |
+|---|---:|---:|---:|---:|
+| **S1** | 15 | 0 | 0 | 5 |
+| **S2** | 0 | 15 | 0 | **10** |
+| **S3** | 0 | 0 | 10 | 5 |
+
+**Mengapa hasilnya berbeda?**
+
+VAM lebih dulu mengalokasikan 15 unit dari S1 ke D1 dengan biaya 1 per unit. Karena permintaan D1 sudah habis, sisa 10 unit dari S2 harus dialokasikan ke D4 melalui sel `[2, 4]` yang biayanya 15 per unit.
+
+SERDA mengambil keputusan berbeda. Setelah memenuhi D2, SERDA menggunakan 10 unit dari S2 untuk memenuhi D1 melalui sel `[2, 1]` dengan biaya 3 per unit.
+
+Pemilihan alokasi SERDA mempertimbangkan nilai deviasi biaya (`CR`), yaitu perbedaan biaya sel terhadap rata-rata biaya baris dan kolom. Dengan urutan tersebut, SERDA tidak perlu menggunakan sel `[2, 4]` yang lebih mahal.
+
+**Perbandingan hasil:**
+
+| Metode | Total Biaya | Selisih dari Optimal |
+|---|---:|---:|
+| **SERDA** | 280 | 0% |
+| **VAM** | 320 | +14,29% |
+
+SERDA mencapai biaya optimal karena alokasinya menghindari penggunaan sel `[2, 4]` yang memiliki biaya tinggi.
+
+---
+
+### 5.3 Case Prioritas Alokasi Kolom: `G2_N14.txt`
+
+SERDA menghasilkan biaya 920, sedangkan VAM menghasilkan biaya 960. Perbedaannya muncul sejak iterasi awal ketika kedua metode menentukan kolom yang harus dipenuhi terlebih dahulu.
+
+**Matriks biaya dan kapasitas:**
+
+| Sumber / Tujuan | D1 | D2 | D3 | D4 | Suplai |
+|---|---:|---:|---:|---:|---:|
+| **S1** | 4 | 6 | 8 | 8 | **40** |
+| **S2** | 6 | 8 | 6 | 7 | **60** |
+| **S3** | 5 | 7 | 6 | 8 | **50** |
+| **Permintaan** | **20** | **30** | **50** | **50** | **150** |
+
+**Biaya optimal eksak: 920**
+
+#### Hasil SERDA
+
+SERDA memprioritaskan D4 sejak iterasi pertama dan menghasilkan total biaya 920.
+
+```text
+Iterasi 1:
+  Kolom 4 → Sel [2, 4] = 50 unit, biaya 7
+  Permintaan D4 terpenuhi
+
+Iterasi 2:
+  Baris 2 → Sel [2, 3] = 10 unit, biaya 6
+  Suplai S2 habis
+
+Iterasi 3:
+  Kolom 3 → Sel [3, 3] = 40 unit, biaya 6
+  Permintaan D3 terpenuhi
+
+Iterasi 4:
+  Baris 1 → Sel [1, 1] = 20 unit, biaya 4
+  Permintaan D1 terpenuhi
+
+Iterasi 5:
+  Baris 1 → Sel [1, 2] = 20 unit, biaya 6
+  Suplai S1 habis
+
+Iterasi 6:
+  Baris 3 → Sel [3, 2] = 10 unit, biaya 7
+  Seluruh kebutuhan terpenuhi
+```
+
+**Matriks alokasi SERDA:**
+
+| Sumber / Tujuan | D1 | D2 | D3 | D4 |
+|---|---:|---:|---:|---:|
+| **S1** | 20 | 20 | 0 | 0 |
+| **S2** | 0 | 0 | 10 | 50 |
+| **S3** | 0 | 10 | 40 | 0 |
+
+**Total biaya SERDA:**
+
+`(20 × 4) + (20 × 6) + (10 × 6) + (50 × 7) + (10 × 7) + (40 × 6) = 920`
+
+#### Hasil VAM Standar
+
+VAM menghasilkan biaya 960, atau 4,35% di atas biaya optimal.
+
+**Matriks alokasi VAM:**
+
+| Sumber / Tujuan | D1 | D2 | D3 | D4 |
+|---|---:|---:|---:|---:|
+| **S1** | 20 | 20 | 0 | 0 |
+| **S2** | 0 | 0 | 50 | 10 |
+| **S3** | 0 | 10 | 0 | **40** |
+
+**Mengapa hasilnya berbeda?**
+
+VAM lebih dulu menggunakan 50 unit suplai S2 untuk memenuhi D3 melalui sel `[2, 3]` dengan biaya 6 per unit.
+
+Akibatnya, hanya tersisa 10 unit dari S2 untuk D4. Kekurangan 40 unit lainnya harus dipenuhi dari S3 melalui sel `[3, 4]` dengan biaya 8 per unit.
+
+SERDA justru memprioritaskan D4 dan langsung mengalokasikan 50 unit dari S2 melalui sel `[2, 4]` dengan biaya 7 per unit.
+
+Keputusan ini membuat SERDA dapat memenuhi seluruh D4 tanpa menggunakan sel `[3, 4]` yang lebih mahal.
+
+**Perbandingan hasil:**
+
+| Metode | Total Biaya | Selisih dari Optimal |
+|---|---:|---:|
+| **SERDA** | 920 | 0% |
+| **VAM** | 960 | +4,35% |
+
+SERDA menghasilkan biaya lebih rendah karena memprioritaskan D4 sebelum suplai S2 digunakan untuk memenuhi tujuan lain.
+
+---
+
+# Panduan Teknis Penggunaan Repositori
+
+## 6. Metode yang Digunakan
+
+Repositori ini menggunakan delapan algoritma untuk menghasilkan *Initial Basic Feasible Solution* (IBFS), yaitu alokasi awal yang memenuhi seluruh suplai dan permintaan.
+
+| Metode | File | Cara Kerja |
+|---|---|---|
+| **SERDA** | `src/SERDA.c` | Menghitung deviasi biaya terhadap rata-rata baris dan kolom untuk menentukan prioritas alokasi. Menggunakan empat tingkat *tie-breaking* agar hasilnya konsisten. |
+| **SAM** | `src/SAM.c` | Menggunakan suplai dan rata-rata biaya baris untuk menentukan alokasi awal, lalu memindahkan alokasi dari baris yang memiliki kelebihan suplai. |
+| **CSM** | `src/CSM.cpp` | Menggunakan total biaya dan suplai baris sebagai bobot, kemudian melakukan substitusi melalui sel donatur dengan biaya kedua terendah. |
+| **RBSM** | `src/RBSM.cpp` | Menentukan substitusi antarbaris berdasarkan penalti dan perbandingan kapasitas suplai. |
+| **IHW** | `src/IHW.c` | Menggunakan *Inverse Contra-Harmonic Mean* (ICHM) sebagai bobot penalti untuk memilih sel alokasi. |
+| **VAM** | `src/VAM.c` | Menggunakan selisih dua biaya terendah untuk menentukan baris atau kolom yang diprioritaskan. |
+| **THP** | `src/THP.c` | Memilih kandidat dari dua penalti tertinggi, lalu membandingkan biaya dikalikan jumlah alokasinya. |
+| **FVAM** | `src/FVAM.c` | Menggunakan rasio dua biaya terendah untuk menentukan penalti, termasuk penanganan biaya bernilai nol. |
+
+SERDA menggunakan rumus:
+
+`CR_ij = C_ij - AVG_i - AVG_j`
+
+Dengan:
+
+- `C_ij`: biaya dari sumber `i` ke tujuan `j`.
+- `AVG_i`: rata-rata biaya pada baris `i`.
+- `AVG_j`: rata-rata biaya pada kolom `j`.
+- `CR_ij`: deviasi biaya yang digunakan SERDA untuk menentukan prioritas alokasi.
+
+Delapan metode tersebut diuji menggunakan dataset yang sama melalui program benchmark, sehingga biaya yang dihasilkan dapat dibandingkan.
+
+---
+
+## 7. Struktur Direktori
+
+Struktur file pada repositori:
+
+```text
+.
+├── dataset/
+│   ├── G1_N01.txt ... G9_R5.txt  # 69 file data uji
+│   └── exact_optimal.json       # Biaya optimal eksak
+│
+├── img/
+│   ├── flowchart-serda.png      # Diagram alir SERDA
+│   └── flowchart-vam.png        # Diagram alir VAM
+│
+├── src/
+│   ├── SERDA.c                  # Implementasi SERDA
+│   ├── FVAM.c                   # Implementasi FVAM
+│   ├── THP.c                    # Implementasi THP
+│   ├── VAM.c                    # Implementasi VAM
+│   ├── SAM.c                    # Implementasi SAM
+│   ├── RBSM.cpp                 # Implementasi RBSM
+│   ├── CSM.cpp                  # Implementasi CSM
+│   ├── IHW.c                    # Implementasi IHW
+│   └── benchmark.cpp            # Program benchmark
+│
+├── results/
+│   ├── benchmark_summary.csv    # Ringkasan performa 8 metode
+│   ├── benchmark_details.csv    # Hasil tiap case
+│   └── benchmark_report.txt     # Laporan perbandingan lengkap
+│
+├── Makefile                     # Perintah kompilasi
+├── .gitattributes               # Pengaturan Git
+└── README.md                    # Dokumentasi proyek
+```
+
+Folder `dataset/` berisi 69 file pengujian dan biaya optimal eksak sebagai pembanding. Implementasi delapan metode dan program benchmark berada di folder `src/`.
+
+Hasil pengujian disimpan di folder `results/`, baik dalam bentuk ringkasan maupun rincian biaya untuk setiap case.
+
+---
+
+## 8. Cara Menjalankan Program
+
+### 8.1 Persiapan
+
+Program membutuhkan:
+
+- **GCC dan G++** untuk kompilasi C/C++.
+- **GNU Make** untuk menjalankan perintah dari `Makefile`.
+
+Pengguna Windows dapat menggunakan MinGW-w64, sedangkan pengguna Linux dapat menggunakan GCC dan G++ yang tersedia pada sistem.
+
+### 8.2 Kompilasi Program
+
+Buka terminal di folder utama repositori, lalu jalankan:
+
+```bash
+make all
+```
+
+Perintah ini akan mengompilasi program sesuai konfigurasi dalam `Makefile`.
+
+### 8.3 Membersihkan File Kompilasi
+
+Jalankan:
+
+```bash
+make clean
+```
+
+Perintah ini menghapus file sementara hasil kompilasi, seperti `.exe` dan `.o`.
+
+`Makefile` menyesuaikan perintah penghapusan berdasarkan sistem operasi:
+
+- **Windows:** menggunakan `del`.
+- **Linux/macOS:** menggunakan `rm`.
+
+---
 
 # Hasil Pengujian & Analisis Komparasi
 
