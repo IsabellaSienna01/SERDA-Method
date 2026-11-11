@@ -134,7 +134,7 @@ Tabel berikut merangkum perbedaan prinsip komputasi antara VAM standar dan SERDA
 | **Metrik Biaya Penalti** | Biaya Transportasi Asli ($c_{(2)} - c_{(1)}$) | Biaya Relatif Dinamis ($CR^{(2)} - CR^{(1)}$) |
 | **Perhitungan Deviasi Rata-rata** | Tidak ada | $AVG_i$ (baris aktif) dan $AVG_j$ (kolom aktif) dihitung tiap iterasi |
 | **Matriks Biaya yang Digunakan** | Matriks biaya asli $C_{ij}$ | Matriks peluang biaya relatif $CR_{ij} = C_{ij} - AVG_i - AVG_j$ |
-| **Aturan Tie-Breaking Garis** | Arbitrary / Garis pertama ditemukan | 4 Tingkat: Penalti $\to$ Min $CR$ $\to$ Baris $\to$ Indeks terkecil |
+| **Aturan Tie-Breaking Garis** | Arbitrary / Garis pertama ditemukan | 4 Tingkat: Penalti terbesar $\to$ Min $CR$ $\to$ Baris $\to$ Indeks terkecil |
 | **Aturan Tie-Breaking Sel** | Minimum biaya asli $C_{ij}$ | 3 Tingkat: Min $CR$ $\to$ Min biaya asli $C_{ij}$ $\to$ Indeks terkecil |
 
 ### 3.1 Pseudocode VAM Standar
